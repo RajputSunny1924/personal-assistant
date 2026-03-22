@@ -11,9 +11,38 @@ import datetime
 import time
 import os
 
+# ---------------- OOP SECURITY SYSTEM ----------------
+class JarvisSecurity:
+    def __init__(self, password, max_attempts=3):
+        self.password = password
+        self.max_attempts = max_attempts
+        self.attempts = 0
 
+    def verify(self):
+        speak("Please speak the voice password")
+        
+        while self.attempts < self.max_attempts:
+            user_pass = takec()
 
-# whattsapp contacts for sending msg
+            if user_pass == "none":
+                # User didn't say anything, don't count as an attempt
+                speak("I didn't hear anything. Please say the password.")
+                continue
+
+            if self.password in user_pass:
+                speak("Access granted")
+                self.attempts = 0
+                return True
+            else:
+                self.attempts += 1
+                remaining = self.max_attempts - self.attempts
+                speak(f"Wrong password. {remaining} attempts remaining")
+
+        # after 3 wrong attempts
+        speak("Maximum attempts reached. Jarvis is now locked")
+        return False
+
+# whatsapp contacts
 contacts = {
     "vishal": "+91 85917 91384", 
     "sunny": "+91 7350288505",
@@ -21,12 +50,13 @@ contacts = {
     "vaishali di": "+91 93097 10981",
 }
 
-# male female voice recogniser
+# male/female voice
 current_voice = 0  
-r= sr.Recognizer()
+r = sr.Recognizer()
 engine = pyttsx3.init()
+security = JarvisSecurity("open system")
 
-# whatsapp msg sending function
+# whatsapp message sending
 def send_whatsapp_message(name, message):
     if name in contacts:
         number = contacts[name]
@@ -36,23 +66,21 @@ def send_whatsapp_message(name, message):
     else:
         speak("Sorry, I don't have this contact saved.")
 
-# jarvis speaking function fresh engine every time
+# jarvis speaking function
 def speak(text):
     global current_voice
     try:
         engine = pyttsx3.init('sapi5')  
         engine.setProperty('rate', 170)
         voices = engine.getProperty('voices')
-
         engine.setProperty('voice', voices[current_voice].id)
-
         engine.say(str(text))
         engine.runAndWait()
     except Exception as e:
         print("Speak Error:", e)
 
-# jarvis intro 
-jarvis_intro = "I am Jarvis, your personal voice assistant.I can open websites, play music, tell jokes, give time and date, perform simple calculations, control system tasks, remember things, and send WhatsApp messages to your contacts. How can I help you today?"
+# jarvis intro
+jarvis_intro = "I am Jarvis, your personal voice assistant. I can open websites, play music, tell jokes, give time and date, perform simple calculations, control system tasks, remember things, and send WhatsApp messages to your contacts. How can I help you today?"
 
 def focus_youtube():
     try:
@@ -65,7 +93,7 @@ def focus_youtube():
         return False
     except:
         return False
-    
+
 # greeting function
 def wishme():
     hour = datetime.datetime.now().hour
@@ -76,26 +104,25 @@ def wishme():
     else:
         speak("Good evening sir")
 
-
-# taking command from user and converting into text
+# taking command from user
 def takec():
     r = sr.Recognizer()
-    with sr.Microphone()as source:
+    with sr.Microphone() as source:
         print("listening...")
-        r.adjust_for_ambient_noise(source,duration=1)
+        r.adjust_for_ambient_noise(source, duration=1)
         audio = r.listen(source)
         try:
             c = r.recognize_google(audio)
             print("you said:", c)
             return c.lower()
         except:
-            return"none"
+            return "none"
 
-# proccesing the command and performing the task
+# processing the command
 def processc(c):
     global current_voice
 
-#opening and closing webistes
+    # opening and closing websites
     if "open google" in c.lower():
         webbrowser.open("https://google.com")
     elif "close google" in c.lower():
@@ -177,86 +204,62 @@ def processc(c):
         speak("flipkart")
         pyautogui.hotkey("ctrl","w")
 
+    # play on youtube
     elif "play" in c.lower():
-
-        query = c.lower().replace("play", "")
-        query = query.replace("on youtube", "")
-        query = query.strip()
-    
+        query = c.lower().replace("play", "").replace("on youtube","").strip()
         if query != "":
             speak(f"Playing {query} on YouTube")
             pywhatkit.playonyt(query)
         else:
             speak("What should I play?")
 
-
+    # youtube search
     elif "youtube" in c.lower() and "search" in c.lower():
-
-        query = c.lower()
-        query = query.replace("search", "")
-        query = query.replace("on youtube", "")
-        query = query.replace("youtube", "")
-        query = query.strip()
-      
+        query = c.lower().replace("search","").replace("on youtube","").replace("youtube","").strip()
         speak(f"Searching YouTube for {query}")
         webbrowser.open(f"https://www.youtube.com/results?search_query={query}")
 
-
+    # google search
     elif "google" in c.lower() and "search" in c.lower():
-
-        query = c.lower()
-        query = query.replace("search", "")
-        query = query.replace("on google", "")
-        query = query.replace("google", "")
-        query = query.strip()
-       
+        query = c.lower().replace("search","").replace("on google","").replace("google","").strip()
         speak(f"Searching Google for {query}")
         webbrowser.open(f"https://www.google.com/search?q={query}")
 
+    # youtube controls
     elif "stop" in c or "resume" in c:
         if focus_youtube():
             pyautogui.press("space")
             speak("Done")
-    
     elif "next video" in c:
         if focus_youtube():
             pyautogui.hotkey("shift","n")
             speak("Playing next video")
-
     elif "previous video" in c:
         if focus_youtube():
             pyautogui.hotkey("shift","p")
             speak("Playing previous video")
-
     elif "mute" in c:
         if focus_youtube():
             pyautogui.press("m")
             speak("Video muted")
-
     elif "volume up youtube" in c:
         if focus_youtube():
             pyautogui.press("up")
-
     elif "volume down youtube" in c:
         if focus_youtube():
             pyautogui.press("down")
-
     elif "full screen" in c:
         if focus_youtube():
             pyautogui.press("f")
-
     elif "exitfull screen" in c:
         if focus_youtube():
             pyautogui.press("f")
-
     elif "forward video" in c:
         if focus_youtube():
             pyautogui.press("l")
-
     elif "backward video" in c:
         if focus_youtube():
             pyautogui.press("j")
-
     elif "skip ad" in c:
         if focus_youtube():
             pyautogui.press("tab")
@@ -264,9 +267,7 @@ def processc(c):
             pyautogui.press("enter")
             speak("Skipping advertisement")
 
-
-    
-#voice change
+    # voice change
     elif "activate female voice" in c.lower():
         current_voice = 1
         speak("female voice activated")
@@ -274,7 +275,7 @@ def processc(c):
         current_voice = 0
         speak("male voice activated")
 
-#personal
+    # personal
     elif "your name" in c.lower():
         speak("My name is Jarvis, your personal assistant")
     elif "how are you" in c.lower():
@@ -286,27 +287,29 @@ def processc(c):
     elif "jarvis" in c.lower():
         speak("yeah")
 
-#system control
+    # system control
     elif "shutdown" in c:
         speak("Shutting down the system")
-        os.system("shutdown /s /t 5") 
+        os.system("shutdown /s /t 5")
     elif "restart" in c:
         speak("Restarting the system")
         os.system("shutdown /r /t 5")
     elif "what can you do" in c or "what are your features" in c:
-        speak(jarvis_intro) 
-#calculations
+        speak(jarvis_intro)
+
+    # calculations
     elif "calculate" in c.lower():
         try:
             question = c.lower().replace("calculate", "").strip()
-            question = question.replace("plus", "+").replace("minus", "-")
-            question = question.replace("into", "*").replace("multiply", "*")
-            question = question.replace("divide", "/").replace("by", "/")
+            question = question.replace("plus","+").replace("minus","-")
+            question = question.replace("into","*").replace("multiply","*")
+            question = question.replace("divide","/").replace("by","/")
             result = simple_eval(question)
             speak(f"The result is {result}")
         except:
             speak("Sorry, I could not calculate that.")
-#time and date
+
+    # time and date
     elif "time" in c.lower():
         current_time = datetime.datetime.now().strftime("%I:%M %p")
         speak(f"The time is {current_time}")
@@ -314,11 +317,12 @@ def processc(c):
         date = datetime.datetime.now().strftime("%d %B %Y")
         speak(f"what is date today {date}")
 
-#jokes
+    # jokes
     elif "joke" in c.lower():
         joke = jokes.get_joke()
         speak(joke)
-#system applications
+
+    # system applications
     elif "open notepad" in c.lower():
         os.startfile("notepad.exe")
     elif "open camera" in c.lower():
@@ -330,53 +334,48 @@ def processc(c):
     elif "open file explorer" in c.lower():
         os.system("explorer")
 
-#volume control
+    # volume control
     elif "volume up" in c.lower():
         pyautogui.press("volumeup")
     elif "volume down" in c.lower():
         pyautogui.press("volumedown")
     elif "mute" in c.lower():
         pyautogui.press("volumemute")
-#whtsap message sending
+
+    # whatsapp message
     elif "send message to" in c.lower():
         try:
-            parts = c.lower().split("send message to", 1)[1].strip()
-            name = parts.split(" ", 1)[0]        # first word = contact name
-            message = parts.split(" ", 1)[1]     # rest = message
-            send_whatsapp_message(name, message)
+            parts = c.lower().split("send message to",1)[1].strip()
+            name = parts.split(" ",1)[0]
+            message = parts.split(" ",1)[1]
+            send_whatsapp_message(name,message)
         except:
             speak("Please say like, send message to vishal hello bro")
     else:
         speak("i didnt understand that")
-#main program
+
+# main program
 active = False
 while True:
     c = takec()
-
     if c == "none":
         continue
-
     if not active:
-        if "hello jarvis"in c:
-            speak("hello sir")
-            wishme()
-            active= True
-
+        if "hello jarvis" in c:
+            speak("Hello sir")
+            if security.verify():
+                wishme()
+                active = True
+            else:
+                speak("Security lock activated. Exiting Jarvis")
+                break
         continue
 
-    # jarvis is active now → bar-bar cs sunega
+    # jarvis is active now
     if "stop jarvis" in c or "exit" in c:
         speak("Jarvis deactivated")
         active = False
         continue
 
     processc(c)
-    time.sleep(0.5)
-
-
-
-
-
-
-
-
+    time.sleep(0.1)

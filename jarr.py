@@ -95,89 +95,39 @@ def takec():
 def processc(c):
     global current_voice
 
-#opening and closing webistes
-    if "open google" in c.lower():
-        webbrowser.open("https://google.com")
-    elif "close google" in c.lower():
-        speak("google")
-        pyautogui.hotkey("ctrl","w")
-    elif "open facebook" in c.lower():
-        webbrowser.open("https://facebook.com")
-    elif "close facebook" in c.lower():
-        speak("facebook")
-        pyautogui.hotkey("ctrl","w")
-    elif "open youtube" in c.lower():
-        webbrowser.open("https://youtube.com")
-    elif "close youtube" in c.lower():
-        speak("youtube")
-        pyautogui.hotkey("ctrl","w")
-    elif "open instagram" in c.lower():
-        webbrowser.open("https://instagram.com")
-    elif "close instagram" in c.lower():
-        speak("instagram")
-        pyautogui.hotkey("ctrl","w")
-    elif "open whatsapp" in c.lower():
-        webbrowser.open("https://whatsapp.com")
-    elif "close whatsapp" in c.lower():
-        speak("whatsapp")
-        pyautogui.hotkey("ctrl","w")
-    elif "open chat gpt" in c.lower():
-        webbrowser.open("https://chatgpt.com")
-    elif "close chat gpta" in c.lower():
-        speak("chatgpt")
-        pyautogui.hotkey("ctrl","w")
-    elif "open gmail" in c.lower():
-        webbrowser.open("https://mail.google.com")
-    elif "close gmail" in c.lower():
-        speak("gmail")
-        pyautogui.hotkey("ctrl","w")
-    elif "open twitter" in c.lower():
-        webbrowser.open("https://twitter.com")
-    elif "close twitter" in c.lower():
-        speak("twitter")
-        pyautogui.hotkey("ctrl","w")
-    elif "open linkedin" in c.lower():
-        webbrowser.open("https://linkedin.com")
-    elif "close linkedin" in c.lower():
-        speak("linkedin")
-        pyautogui.hotkey("ctrl","w")
-    elif "open github" in c.lower():
-        webbrowser.open("https://github.com")
-    elif "close github" in c.lower():
-        speak("github")
-        pyautogui.hotkey("ctrl","w")
-    elif "open stackoverflow" in c.lower():
-        webbrowser.open("https://stackoverflow.com")
-    elif "close stackoverflow" in c.lower():
-        speak("stackoverflow")
-        pyautogui.hotkey("ctrl","w")
-    elif "open map" in c.lower():
-        webbrowser.open("https://maps.google.com")
-    elif "close maps" in c.lower():
-        speak("maps")
-        pyautogui.hotkey("ctrl","w")
-    elif "open spotify" in c.lower():
-        webbrowser.open("https://open.spotify.com")
-    elif "close spotify" in c.lower():
-        speak("spotify")
-        pyautogui.hotkey("ctrl","w")
-    elif "open netflix" in c.lower():
-        webbrowser.open("https://netflix.com")
-    elif "close netflix" in c.lower():
-        speak("netflix")
-        pyautogui.hotkey("ctrl","w")
-    elif "open amazon" in c.lower():
-        webbrowser.open("https://amazon.in")
-    elif "close amazon" in c.lower():
-        speak("amazon")
-        pyautogui.hotkey("ctrl","w")
-    elif "open flipkart" in c.lower():
-        webbrowser.open("https://flipkart.com")
-    elif "close flipkart" in c.lower():
-        speak("flipkart")
-        pyautogui.hotkey("ctrl","w")
-
-    elif "play" in c.lower():
+    
+    
+    sites = {
+        "google": "https://google.com",
+        "facebook": "https://facebook.com",
+        "youtube": "https://youtube.com",
+        "instagram": "https://instagram.com",
+        "whatsapp": "https://whatsapp.com",
+        "chat gpt": "https://chatgpt.com",
+        "gmail": "https://mail.google.com",
+        "twitter": "https://twitter.com",
+        "linkedin": "https://linkedin.com",
+        "github": "https://github.com",
+        "stackoverflow": "https://stackoverflow.com",
+        "maps": "https://maps.google.com",
+        "spotify": "https://open.spotify.com",
+        "netflix": "https://netflix.com",
+        "amazon": "https://amazon.in",
+        "flipkart": "https://flipkart.com"
+    }
+    
+    for site in sites:
+        if f"open {site}" in c:
+            speak(f"Opening {site}")
+            webbrowser.open(sites[site])
+            return
+    
+        if f"close {site}" in c:
+            speak(f"Closing {site}")
+            pyautogui.hotkey("ctrl","w")
+            return
+    
+    if "play" in c.lower():
 
         query = c.lower().replace("play", "")
         query = query.replace("on youtube", "")
